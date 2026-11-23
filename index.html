@@ -218,14 +218,13 @@
     .signature { font: 700 1.9rem "Caveat", cursive; color: var(--berry); margin-top: 25px; }
 
     /* ============ MEMORIES (polaroid-style cards) ============ */
-    .media-grid { display: grid; grid-template-columns: minmax(0, 720px); justify-content: center; margin-top: 62px; }
+    .media-grid { display: grid; grid-template-columns: minmax(0, 400px); justify-content: center; margin-top: 62px; }
     .media-card { position: relative; background: white; padding: 14px 14px 10px; border-radius: 20px; box-shadow: var(--shadow); text-align: left; }
     .media-card:nth-child(1) { transform: rotate(-1.2deg); }
     .media-card:hover { transform: rotate(0) scale(1.02); box-shadow: 0 24px 60px rgba(120,72,93,.22); }
     .media-card h3 { font: 600 1.3rem "Playfair Display", serif; margin: 12px 8px 5px; color: var(--berry); }
     .media-card p { margin: 0 8px 12px; color: var(--muted); font-size: .85rem; line-height: 1.6; }
-    .media-card video, .media-card img { display: block; width: 100%; max-height: 390px; object-fit: cover; border-radius: 14px; background: #f3dce5; }
-    .media-card video { aspect-ratio: 16 / 9; }
+    .media-card video { display: block; width: auto; max-width: 100%; height: auto; max-height: min(72vh, 640px); margin: 0 auto; border-radius: 14px; background: #f3dce5; }
 
     /* ============ SURPRISE ============ */
     .surprise-card {
@@ -622,8 +621,8 @@
             <span class="peeker right" aria-hidden="true" data-sticker="hachiware">🐱</span>
             <!-- Put your video in the same place as index.html and name it our-memory.mp4,
                  or change the src below to match your video filename. -->
-            <video controls playsinline preload="metadata" poster="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1000&q=80">
-              <source src="our-memory.mp4" type="video/mp4">
+            <video controls playsinline preload="metadata">
+              <source src="our-memory.mp4#t=0.1" type="video/mp4">
               Your browser does not support embedded video.
             </video>
             <h3>Our little video ♡</h3>
