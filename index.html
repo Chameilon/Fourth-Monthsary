@@ -218,17 +218,14 @@
     .signature { font: 700 1.9rem "Caveat", cursive; color: var(--berry); margin-top: 25px; }
 
     /* ============ MEMORIES (polaroid-style cards) ============ */
-    .media-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 34px; margin-top: 62px; align-items: stretch; }
+    .media-grid { display: grid; grid-template-columns: minmax(0, 720px); justify-content: center; margin-top: 62px; }
     .media-card { position: relative; background: white; padding: 14px 14px 10px; border-radius: 20px; box-shadow: var(--shadow); text-align: left; }
     .media-card:nth-child(1) { transform: rotate(-1.2deg); }
-    .media-card:nth-child(2) { transform: rotate(1.5deg); }
     .media-card:hover { transform: rotate(0) scale(1.02); box-shadow: 0 24px 60px rgba(120,72,93,.22); }
     .media-card h3 { font: 600 1.3rem "Playfair Display", serif; margin: 12px 8px 5px; color: var(--berry); }
     .media-card p { margin: 0 8px 12px; color: var(--muted); font-size: .85rem; line-height: 1.6; }
     .media-card video, .media-card img { display: block; width: 100%; max-height: 390px; object-fit: cover; border-radius: 14px; background: #f3dce5; }
     .media-card video { aspect-ratio: 16 / 9; }
-    .media-card .gif-image { aspect-ratio: 4 / 5; }
-    .gif-placeholder { display: none; min-height: 220px; place-items: center; background: #fdeef3; border: 2px dashed #e4b9ca; border-radius: 14px; color: var(--rose); padding: 25px; font: 700 1.4rem "Caveat", cursive; }
 
     /* ============ SURPRISE ============ */
     .surprise-card {
@@ -499,8 +496,7 @@
     /* ============ PHONES ============ */
     @media (max-width: 760px) {
       .media-grid { grid-template-columns: 1fr; }
-      .media-card .gif-image { aspect-ratio: 16 / 9; }
-      .topbar { padding: 24px 16px 14px; }
+        .topbar { padding: 24px 16px 14px; }
       .topbar.scrolled { padding-top: 16px; padding-bottom: 10px; }
       .nav { gap: 2px; font-size: .72rem; }
       .nav a { padding: 5px 8px; }
@@ -620,27 +616,18 @@
       <div class="wrap center">
         <div class="diary-stamp">PAGE 02 · LITTLE MEMORIES ♡</div><div class="section-tag">a memory in motion</div>
         <h2 class="section-title">Our memories, on replay.</h2>
-        <p class="intro">Add a short video of a favorite memory, or a cute GIF that reminds you of her. You can use either one—or keep both.</p>
+        <p class="intro">A little video of a memory I wanted to keep with you. Press play, Baby. ♡</p>
         <div class="media-grid">
           <article class="media-card reveal">
             <span class="peeker right" aria-hidden="true" data-sticker="hachiware">🐱</span>
-            <!-- Put your video in the same folder as this HTML file and name it our-memory.mp4,
+            <!-- Put your video in the same place as index.html and name it our-memory.mp4,
                  or change the src below to match your video filename. -->
             <video controls playsinline preload="metadata" poster="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1000&q=80">
               <source src="our-memory.mp4" type="video/mp4">
               Your browser does not support embedded video.
             </video>
             <h3>Our little video ♡</h3>
-            <p>Replace <strong>our-memory.mp4</strong> with your own short video.</p>
-          </article>
-          <article class="media-card reveal" style="--d:.15s">
-            <span class="peeker" aria-hidden="true" data-sticker="usagi">🐻</span>
-            <!-- Put your GIF in the same folder and name it our-memory.gif,
-                 or change the src to your GIF filename. -->
-            <img class="gif-image" src="our-memory.gif" alt="A GIF memory of us" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-            <div class="gif-placeholder">Your GIF goes here ♡</div>
-            <h3>A tiny GIF moment</h3>
-            <p>Or replace <strong>our-memory.gif</strong> with a cute animated GIF.</p>
+            <p>A little moment I wanted to keep ♡</p>
           </article>
         </div>
       </div>
