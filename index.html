@@ -327,6 +327,23 @@
     .trail { position: fixed; bottom: 8px; font-size: .95rem; opacity: .75; pointer-events: none; z-index: 39; animation: fadeaway 2.8s forwards; }
     @keyframes fadeaway { to { opacity: 0; transform: scale(.7); } }
 
+    /* ============ GROUP HUG (all chibis hug the screen) ============ */
+    .critter { transform-origin: 50% 100%; transition: scale .6s cubic-bezier(.34, 1.56, .64, 1), translate .7s ease; }
+    .critter.embrace { scale: var(--s, 3); translate: 0 calc(-50vh + 26px * var(--s, 3)); }
+    .critter.embrace .bob { animation: squish .7s ease-in-out infinite; }
+    .hug-glow {
+      position: fixed; inset: 0; z-index: 30; pointer-events: none; opacity: 0; transition: opacity .6s;
+      background: radial-gradient(circle at 50% 55%, rgba(255, 182, 208, .55), rgba(255, 182, 208, .15) 60%, transparent 80%);
+    }
+    .hug-glow.show { opacity: 1; }
+    .hug-toast {
+      position: fixed; left: 50%; top: 16%; z-index: 75; translate: -50% 0; padding: 8px 22px; border-radius: 99px;
+      background: #fff; color: var(--berry); font: 700 clamp(1.4rem, 5vw, 2.2rem)/1.2 "Caveat", cursive; white-space: nowrap;
+      box-shadow: 0 10px 30px rgba(120, 72, 93, .25); pointer-events: none;
+      opacity: 0; scale: .7; transition: opacity .3s, scale .4s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .hug-toast.show { opacity: 1; scale: 1; }
+
     /* ============ STICKER LOOK (white outline + soft shadow) ============ */
     .sticker-art {
       display: block; width: 3.7rem; height: auto; overflow: visible;
@@ -921,6 +938,8 @@ Your Baby ♡</p>
   <!-- layers for the walking critters and the sparkle effects -->
   <div class="critter-layer" id="critterLayer"></div>
   <div class="fx" id="fx" aria-hidden="true"></div>
+  <div class="hug-glow" id="hugGlow" aria-hidden="true"></div>
+  <div class="hug-toast" id="hugToast" aria-live="polite"></div>
 
   <script>
     /* ========== HELPERS ========== */
@@ -1141,9 +1160,9 @@ Your Baby ♡</p>
     const critters = [];
 
     const critterList = [
-      { name: "the bear",  sticker: "chiikawa",  emoji: "🐻", speed: 28, trail: "💗", say: ["bear hug! ♡", "I love you Baby ♡", "happy 4 months!", "hugs are free here ♡"] },
-      { name: "the cat", sticker: "hachiware", emoji: "🐱", speed: 40, trail: "🩷", say: ["meow ♡", "happy 4 months!", "Eunice is the prettiest ♡", "pet me, Baby!"] },
-      { name: "the bunny",     sticker: "usagi",     emoji: "🐰", speed: 52, trail: "🤍", say: ["hop hop ♡", "carrots for kisses?", "so happy for you two!", "you're my favorite human ♡"] }
+      { name: "the bear",  sticker: "chiikawa",  emoji: "🐻", speed: 28, trail: "💗", say: ["bear hug! ♡", "I love you Baby ♡", "happy 4 months!", "hugs are free here ♡", "squish me, Baby ♡", "one hug, coming right up!", "you're my favorite person", "I'd share my honey with you", "warm hugs for Eunice ♡", "you did great today ♡", "drink some water, Baby!", "I saved you a cozy spot", "you're so loved, you know?", "grrr... I mean, I love you", "snuggle time?", "I'll guard your heart ♡", "4 months of cuddles!", "nap with me later?", "you make everything softer ♡"] },
+      { name: "the cat", sticker: "hachiware", emoji: "🐱", speed: 40, trail: "🩷", say: ["meow ♡", "happy 4 months!", "Eunice is the prettiest ♡", "pet me, Baby!", "purr purr purr~", "mrrp? I mean, I love you", "head pats, please ♡", "nyaa~ you're so cute", "tail wiggle for you ♡", "scritches for Eunice?", "I'm sleepy, wanna nap?", "psst... smile for me ♡", "meow meow, I love you!", "I sat on your heart ♡", "your smile is purr-fect", "stay for a little longer?", "have you eaten yet, Baby?", "hello, pretty ♡", "you're my favorite human"] },
+      { name: "the bunny",     sticker: "usagi",     emoji: "🐰", speed: 52, trail: "🤍", say: ["hop hop ♡", "carrots for kisses?", "so happy for you two!", "boing boing ♡", "I hopped all the way here!", "you're the cutest, Baby", "hugs and carrots for you", "wiggle wiggle ♡", "yay! 4 months!", "I believe in you, Eunice!", "want to hop with me?", "you're blooming like a peony", "don't forget to smile ♡", "tiny hop of happiness!", "sending you a hop-kiss", "you make my heart go thump", "stay cozy, okay?", "more days, more hops ♡"] }
     ];
 
     critterList.forEach((info, i) => {
@@ -1174,7 +1193,10 @@ Your Baby ♡</p>
         el.classList.remove("hop");
         void el.offsetWidth; // restart the animation
         el.classList.add("hop");
-        c.bubble.textContent = pick(info.say);
+        let line = pick(info.say);
+        while (line === c.lastLine) line = pick(info.say); // never say the same thing twice in a row
+        c.lastLine = line;
+        c.bubble.textContent = line;
         el.classList.add("talking");
         c.pause = 2.2;
         el.classList.add("paused");
@@ -1209,7 +1231,11 @@ Your Baby ♡</p>
       const maxX = Math.max(minX + 60, window.innerWidth - 110);
 
       critters.forEach((c) => {
-        if (c.pause > 0) {
+        if (c.hugging) {
+          c.x += (c.targetX - c.x) * Math.min(1, dt * 5); // slide to the middle for the group hug
+          c.dir = -1;                                      // face the screen
+          c.lastPrint = c.x;
+        } else if (c.pause > 0) {
           c.pause -= dt;
           if (c.pause <= 0) c.el.classList.remove("paused");
         } else {
@@ -1631,6 +1657,82 @@ Your Baby ♡</p>
     const hugText = document.getElementById("hugText");
     let hugs = 0;
 
+    // ----- cute squeaky sound, made right in the browser (no sound file needed) -----
+    let audioCtx = null;
+    function beep(freqStart, freqEnd, start, duration, volume) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freqStart, start);
+      osc.frequency.exponentialRampToValueAtTime(freqEnd, start + duration);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(start);
+      osc.stop(start + duration + 0.02);
+    }
+    function playHugSound(bigOne) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const t = audioCtx.currentTime;
+        const base = 520 + Math.random() * 120; // a tiny pitch change each time keeps it fun
+        beep(base, base * 1.5, t, 0.14, 0.18);               // "mu-"
+        beep(base * 1.25, base * 1.9, t + 0.12, 0.16, 0.16);  // "-wah!"
+        if (bigOne) {                                          // happy little chime on milestones
+          [784, 988, 1175, 1568].forEach((f, i) => beep(f, f, t + 0.3 + i * 0.11, 0.25, 0.12));
+        }
+      } catch (error) {
+        // if the browser blocks sound, it just stays quiet
+      }
+    }
+
+    // ----- group hug: every chibi runs to the middle and hugs the screen -----
+    const hugToast = document.getElementById("hugToast");
+    const hugGlow = document.getElementById("hugGlow");
+    let groupHugging = false;
+
+    function groupHug(count) {
+      if (groupHugging) return;
+      groupHugging = true;
+      hugToast.textContent = count + " hugs!! group hug time ♡";
+      hugToast.classList.add("show");
+      hugGlow.classList.add("show");
+
+      const w = window.innerWidth;
+      const bigScale = Math.min(4.2, w / 230);        // smaller on phones so all three fit
+      const spread = Math.min(230, w / 3.2);
+      critters.forEach((c, i) => {
+        c.hugging = true;
+        c.targetX = w / 2 - 30 + (i - 1) * spread;      // left, middle, right
+        c.el.classList.remove("paused", "talking");
+        c.el.style.setProperty("--s", bigScale);
+        c.el.classList.add("embrace");
+      });
+
+      // hearts pop out while they squeeze
+      [700, 1500, 2300].forEach((ms) => setTimeout(() => {
+        critters.forEach((c) => {
+          const r = c.el.getBoundingClientRect();
+          burst(r.left + r.width / 2, r.top + r.height / 2, 6);
+        });
+      }, ms));
+
+      // then everyone goes back to walking
+      setTimeout(() => {
+        critters.forEach((c) => {
+          c.hugging = false;
+          c.el.classList.remove("embrace");
+          c.el.style.removeProperty("--s");
+        });
+        hugToast.classList.remove("show");
+        hugGlow.classList.remove("show");
+        groupHugging = false;
+      }, 3200);
+    }
+
     hugBear.addEventListener("click", () => {
       hugs++;
       hugBear.classList.remove("squish");
@@ -1641,7 +1743,12 @@ Your Baby ♡</p>
       if (hugs === 5) message = "5 hugs! the bear is blushing ♡";
       if (hugs === 10) message = "10 hugs! I love you this much and more ♡";
       if (hugs === 20) message = "20 hugs?! okay, you win, Baby ♡";
+      if (hugs % 5 === 0 && hugs <= 40 && hugs !== 5 && hugs !== 10 && hugs !== 20) message = hugs + " hugs! the whole gang is hugging you ♡";
       hugText.textContent = message;
+
+      const milestone = hugs % 5 === 0 && hugs <= 40; // 5, 10, 15 ... 40
+      playHugSound(milestone);
+      if (milestone) groupHug(hugs);
 
       const r = hugBear.getBoundingClientRect();
       burst(r.left + r.width / 2, r.top + r.height / 3, 10);
