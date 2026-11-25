@@ -328,8 +328,10 @@
     @keyframes fadeaway { to { opacity: 0; transform: scale(.7); } }
 
     /* ============ GROUP HUG (all chibis hug the screen) ============ */
-    .critter { transform-origin: 50% 100%; transition: scale .6s cubic-bezier(.34, 1.56, .64, 1), translate .7s ease; }
-    .critter.embrace { scale: var(--s, 3); translate: 0 calc(-50vh + 26px * var(--s, 3)); }
+    .critter { transition: translate .7s ease; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+    .critter .sticker-art, .critter .stk { transform-origin: 50% 100%; transition: scale .6s cubic-bezier(.34, 1.56, .64, 1); }
+    .critter.embrace { translate: 0 calc(-50vh + 28px * var(--s, 3)); }
+    .critter.embrace .sticker-art, .critter.embrace .stk { scale: var(--s, 3); }
     .critter.embrace .bob { animation: squish .7s ease-in-out infinite; }
     .hug-glow {
       position: fixed; inset: 0; z-index: 30; pointer-events: none; opacity: 0; transition: opacity .6s;
@@ -343,6 +345,86 @@
       opacity: 0; scale: .7; transition: opacity .3s, scale .4s cubic-bezier(.34, 1.56, .64, 1);
     }
     .hug-toast.show { opacity: 1; scale: 1; }
+
+    /* ============ CHIBI EXTRAS: carrying, landing, sleeping ============ */
+    .critter.held { cursor: grabbing; z-index: 5; }
+    .critter.held .bob { animation: dangle .45s ease-in-out infinite; }
+    .critter.landed .bob { animation: squish .35s ease; }
+    .critter.sleeping .bob { animation: snooze 3.2s ease-in-out infinite; opacity: .88; }
+    @keyframes dangle { 0%,100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg) scale(1.06); } }
+    @keyframes snooze { 0%,100% { transform: rotate(6deg) scale(1); } 50% { transform: rotate(6deg) scale(1.06); } }
+    .zzz { position: absolute; left: 62%; bottom: 85%; font: 700 1.3rem "Caveat", cursive; color: #b88aa0; pointer-events: none; animation: zfloat 2.6s ease-out forwards; }
+    @keyframes zfloat { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(14px, -46px) scale(1.4) rotate(12deg); } }
+
+    /* ============ HERO GREETING + MONTHSARY DAY ============ */
+    .greeting { min-height: 1.2em; margin-bottom: 10px; font: 700 clamp(1.5rem, 4vw, 2.1rem) "Caveat", cursive; color: #ffe5ed; text-shadow: 0 2px 14px rgba(91, 49, 70, .45); }
+    .eyebrow.today { background: rgba(255, 255, 255, .88); color: var(--berry); border-color: #fff; font-weight: 700; animation: gentlepulse 2.4s ease-in-out infinite; }
+    @keyframes gentlepulse { 50% { transform: scale(1.05); } }
+
+    /* ============ OPEN-WHEN TRACKER + SECRET ENVELOPE ============ */
+    .env-progress { margin: 16px auto 0; font: 700 1.3rem "Caveat", cursive; color: var(--pink); }
+    @keyframes envnudge { 0%, 86%, 100% { rotate: 0deg; } 90% { rotate: -2.5deg; } 94% { rotate: 2.5deg; } 97% { rotate: -1deg; } }
+    .env-card:not(.opened) .env { animation: envnudge 5s ease-in-out infinite; animation-delay: var(--w, 0s); }
+    .env-secret { grid-column: 2; }
+    .env-secret .env { background: linear-gradient(160deg, #fff4cf, #ffd9e6); box-shadow: 0 10px 30px rgba(247, 196, 120, .4); }
+    .env-secret .env-flap { background: #f7cf8a; }
+    .env-card.appear { animation: reveal .9s ease both; }
+    @media (max-width: 760px) { .env-secret { grid-column: 1 / -1; justify-self: center; width: calc(50% - 11px); } }
+    @media (max-width: 520px) { .env-secret { width: 100%; } }
+
+    /* ============ FAVORITE REASONS ============ */
+    .fav-btn { margin-top: 14px; border: 1px solid #f0c3d4; background: #fff8fa; color: var(--pink); border-radius: 99px; padding: 7px 18px; font-weight: 700; font-size: .85rem; cursor: pointer; transition: background .2s, transform .2s; }
+    .fav-btn:hover { background: var(--petal); transform: scale(1.05); }
+    .fav-btn.saved { background: #ffe1ec; color: #d0557f; }
+    .fav-box { margin-top: 30px; padding: 22px 18px 14px; background: #fff; border: 2px dashed #f0c3d4; border-radius: 22px; }
+    .fav-box h3 { margin: 0 0 14px; font: italic 600 1.5rem "Playfair Display", serif; color: var(--pink); }
+    .fav-list { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow-y: auto; display: grid; gap: 8px; text-align: left; }
+    .fav-list li { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; padding: 10px 14px; background: #fff8fa; border-radius: 12px; color: var(--ink); font-size: .9rem; line-height: 1.55; }
+    .fav-list button { flex-shrink: 0; border: 0; background: none; color: #c99aae; cursor: pointer; font-size: 1rem; }
+    .fav-list button:hover { color: #d0557f; }
+
+    /* ============ TYPEWRITER LETTER + SECRET HEART ============ */
+    .hidden-letter p.typing::after { content: "▏"; color: var(--pink); animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .big-heart { display: block; margin: 20px auto; padding: 0; border: 0; background: none; cursor: pointer; line-height: 1; font-family: inherit; }
+    .big-heart.thump { animation: thump .35s ease; }
+    @keyframes thump { 0% { transform: scale(1); } 40% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    .secret-msg { max-width: 560px; margin: 26px auto 0; padding: 24px 26px; background: rgba(255, 255, 255, .12); border: 1px dashed rgba(255, 255, 255, .5); border-radius: 20px; animation: reveal .7s ease both; }
+    .secret-msg p { margin: 0; font: 700 1.5rem/1.4 "Caveat", cursive; color: #fff; }
+
+    /* ============ MY PLAYLIST (Spotify cover, record sleeve) ============ */
+    .playlist-section { --bg: #fffdfd; }
+    .sleeve-wrap { position: relative; isolation: isolate; max-width: 520px; margin: 78px auto 0; }
+    .sleeve-wrap::before { content: ""; position: absolute; left: 50%; top: 0; width: 440px; height: 440px; translate: -50% -4%; background: radial-gradient(circle, #ffe3ec, transparent 65%); z-index: -1; }
+    .sleeve { position: relative; display: block; width: min(250px, 66vw); aspect-ratio: 1; margin: 0 auto; translate: -26px 0; }
+    .record {
+      position: absolute; top: 4%; left: 28%; width: 92%; height: 92%; border-radius: 50%; display: grid; place-items: center;
+      background: repeating-radial-gradient(circle, #3b2330 0 2px, #4a2c3c 2px 4px);
+      box-shadow: 0 8px 20px rgba(120, 72, 93, .35); animation: spin 6s linear infinite;
+      transition: left .5s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .record::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 20deg, transparent 0 30%, rgba(255,255,255,.2) 35% 40%, transparent 45% 80%, rgba(255,255,255,.15) 85% 90%, transparent 95%); }
+    .record-label { position: relative; z-index: 1; width: 32%; height: 32%; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, #ffd1e1, #f09ab8); color: #fff; font-size: 1.2rem; }
+    .sleeve:hover .record, .sleeve:focus-visible .record { left: 42%; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .cover {
+      position: absolute; inset: 0; border-radius: 12px; overflow: hidden; display: grid; place-items: center;
+      background: linear-gradient(145deg, #ffd1e1, #f09ab8 60%, #bd718b);
+      box-shadow: 0 14px 34px rgba(120, 72, 93, .3); rotate: -3deg; transition: rotate .3s;
+    }
+    .sleeve:hover .cover, .sleeve:focus-visible .cover { rotate: 0deg; }
+    .cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .cover-fallback { font-size: 5rem; line-height: 1; color: rgba(255, 255, 255, .85); }
+    .now-playing { display: inline-flex; gap: 10px; align-items: center; margin-top: 30px; padding: 8px 18px; background: #fff8fa; border: 1px solid #f0c3d4; border-radius: 99px; color: var(--berry); font-weight: 700; font-size: .9rem; }
+    .now-playing[hidden], .playlist-embed[hidden] { display: none; }
+    .eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 16px; }
+    .eq i { width: 4px; height: 100%; background: var(--pink); border-radius: 2px; transform-origin: bottom; animation: eqbar 1s ease-in-out infinite; }
+    .eq i:nth-child(2) { animation-delay: -.3s; } .eq i:nth-child(3) { animation-delay: -.6s; } .eq i:nth-child(4) { animation-delay: -.15s; }
+    @keyframes eqbar { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+    .playlist-actions { margin-top: 18px; }
+    .playlist-actions .surprise-button { margin-bottom: 10px; }
+    .playlist-embed { margin-top: 18px; }
+    .playlist-embed iframe { display: block; width: 100%; border: 0; border-radius: 16px; }
 
     /* ============ STICKER LOOK (white outline + soft shadow) ============ */
     .sticker-art {
@@ -565,7 +647,8 @@
       <span class="floating f7" data-depth="0.7" data-sticker="chiikawa">💗</span>
 
       <div class="hero-content">
-        <div class="eyebrow">a little love diary · our 4th monthsary</div>
+        <div class="greeting" id="heroGreeting"></div>
+        <div class="eyebrow" id="heroEyebrow">a little love diary · our 4th monthsary</div>
         <h1>Happy 4th<br><em>Monthsary, Baby!</em></h1>
         <p class="hero-copy">A little diary filled with peonies, soft memories, tiny hearts, and all the reasons I am grateful that you are mine. Every page is made with love, just for you.</p>
         <a class="hero-button" href="#letter">Open your little surprise ♡</a>
@@ -682,6 +765,7 @@ Happy 4th monthsary, my love. Here's to more pages, more memories, and more litt
 
 With all my love,
 Your Baby ♡</p>
+            <button class="song-toggle" id="skipTyping" type="button" hidden>show the whole letter</button>
           </article>
         </div>
       </div>
@@ -808,6 +892,7 @@ Your Baby ♡</p>
         <div class="diary-stamp">PAGE 04 · OPEN WHEN... ♡</div><div class="section-tag">little letters for every mood</div>
         <h2 class="section-title">Open when...</h2>
         <p class="intro">Tap an envelope when you need it. Each one has a little note just for you. ♡</p>
+        <p class="env-progress" id="envProgress"></p>
         <!-- To change a note, edit the words inside the env-note paragraph. To change the title, edit the env-label. -->
         <div class="env-grid reveal">
           <div class="env-card">
@@ -894,6 +979,13 @@ Your Baby ♡</p>
             </button>
             <div class="env-note"><p>There are moments when loneliness finds its way into even the busiest days. I wish I could always be there to remind you that you're not forgotten, not overlooked, and never insignificant. Even when we're apart, you occupy a little space in my thoughts that nobody else could ever fill.</p></div>
           </div>
+          <div class="env-card env-secret" id="secretEnvelope" hidden>
+            <button class="env" type="button" aria-expanded="false">
+              <span class="env-flap"></span><span class="env-seal">💝</span>
+              <span class="env-label"><small>open when</small>you've opened them all</span>
+            </button>
+            <div class="env-note"><p>You opened every single one. Of course you did. Here's the last one, Baby: I wrote all of these so that no matter what kind of day you're having, there's a little piece of me waiting for you. You don't have to carry everything alone. I'm on your side, today and on all the ordinary days after. I love you ♡</p></div>
+          </div>
         </div>
       </div>
     </section>
@@ -912,8 +1004,38 @@ Your Baby ♡</p>
           <div class="reason-card" id="reasonCard" aria-live="polite">
             <div class="reason-num" id="reasonNum">tap the jar ♡</div>
             <p class="reason-text" id="reasonText">A little reason is waiting for you inside.</p>
+            <button class="fav-btn" id="favBtn" type="button" hidden aria-pressed="false" data-own-burst>♡ save</button>
           </div>
           <p class="audio-note" id="reasonCount"></p>
+          <div class="fav-box" id="favBox" hidden>
+            <h3>My favorites ♡</h3>
+            <ul class="fav-list" id="favList"></ul>
+            <p class="audio-note">Saved on this device, so they'll still be here next time ♡</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section playlist-section" id="playlist" hidden>
+      <div class="wrap center">
+        <div class="diary-stamp">PAGE 06 · MY PLAYLIST ♡</div><div class="section-tag">the soundtrack of you</div>
+        <h2 class="section-title">Songs I play when I think of you.</h2>
+        <p class="intro">Every song in here reminds me of you, one way or another. Press play and listen along, Baby. ♡</p>
+        <div class="sleeve-wrap reveal">
+          <span class="peeker center" aria-hidden="true" data-sticker="hachiware">🐱</span>
+          <a class="sleeve" id="playlistSleeve" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open our playlist on Spotify">
+            <span class="record" aria-hidden="true"><span class="record-label">♡</span></span>
+            <span class="cover" id="playlistCover"><span class="cover-fallback">♡</span></span>
+          </a>
+          <div class="now-playing" id="playlistNow" hidden>
+            <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span id="playlistName"></span>
+          </div>
+          <div class="playlist-actions">
+            <a class="surprise-button" id="playlistOpen" href="#" target="_blank" rel="noopener noreferrer">Open on Spotify ♡</a><br>
+            <button class="song-toggle" id="playlistHere" type="button">or play it right here</button>
+          </div>
+          <div class="playlist-embed" id="playlistEmbed" hidden></div>
         </div>
       </div>
     </section>
@@ -927,8 +1049,9 @@ Your Baby ♡</p>
       <div class="section-tag" style="color:#f2b9b4">and one last thing...</div>
       <h2 class="section-title">I'm so glad it's you.</h2>
       <p>Happy 4th monthsary, my love.<br>May this be one of many little celebrations of us.</p>
-      <div class="big-heart">♥</div>
+      <button class="big-heart" id="bigHeart" type="button" data-own-burst aria-label="A big heart">♥</button>
       <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem">I love you, always and in all the little ways.</p>
+      <div class="secret-msg" id="secretMsg" hidden><p>You found my secret ♡ Of everything on this page, this is the little corner I hoped you'd find. Thank you for choosing me, for being patient with me, and for letting me love you. I'm so lucky it's you, Baby.</p></div>
       <button class="hug-bear" id="hugBear" type="button" data-own-burst aria-label="Give the bear a hug"><span data-sticker="chiikawa">🐻</span></button>
       <p class="hug-text" id="hugText">tap the bear for a hug ♡</p>
       <div class="footer">MADE WITH ♡ JUST FOR YOU</div>
@@ -946,6 +1069,38 @@ Your Baby ♡</p>
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches; // respects "reduce motion" settings
     const fx = document.getElementById("fx");
     const pick = (list) => list[Math.floor(Math.random() * list.length)];
+
+    // tiny helpers that remember things on her device (localStorage). If the browser blocks it, nothing breaks.
+    function loadSaved(key, fallback) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return value === null ? fallback : value;
+      } catch (error) {
+        return fallback;
+      }
+    }
+    function storeSaved(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch (error) { /* ignore */ }
+    }
+    let eggFound = false; // becomes true once she finds the secret in the big heart
+
+    // ----- what time is it for her? -----
+    // To test, add ?preview=night (or morning, afternoon, evening, monthsary) to the end of the web address.
+    const params = new URLSearchParams(window.location.search);
+    const preview = params.get("preview");
+    let hour = new Date().getHours();
+    if (preview === "morning") hour = 8;
+    if (preview === "afternoon") hour = 14;
+    if (preview === "evening") hour = 19;
+    if (preview === "night") hour = 23;
+    const isNight = hour >= 21 || hour < 5;
+
+    let greeting = "Good evening, Baby ♡";
+    if (hour >= 5 && hour < 12) greeting = "Good morning, Baby ♡";
+    else if (hour >= 12 && hour < 18) greeting = "Good afternoon, Baby ♡";
+    else if (isNight) greeting = "Good night, Baby ♡ it's late, rest soon";
+    document.getElementById("heroGreeting").textContent = greeting;
+
 
     /* ========== STICKERS ==========
        Put your sticker pictures (transparent PNGs) in a folder called "stickers"
@@ -1160,10 +1315,60 @@ Your Baby ♡</p>
     const critters = [];
 
     const critterList = [
-      { name: "the bear",  sticker: "chiikawa",  emoji: "🐻", speed: 28, trail: "💗", say: ["bear hug! ♡", "I love you Baby ♡", "happy 4 months!", "hugs are free here ♡", "squish me, Baby ♡", "one hug, coming right up!", "you're my favorite person", "I'd share my honey with you", "warm hugs for Eunice ♡", "you did great today ♡", "drink some water, Baby!", "I saved you a cozy spot", "you're so loved, you know?", "grrr... I mean, I love you", "snuggle time?", "I'll guard your heart ♡", "4 months of cuddles!", "nap with me later?", "you make everything softer ♡"] },
-      { name: "the cat", sticker: "hachiware", emoji: "🐱", speed: 40, trail: "🩷", say: ["meow ♡", "happy 4 months!", "Eunice is the prettiest ♡", "pet me, Baby!", "purr purr purr~", "mrrp? I mean, I love you", "head pats, please ♡", "nyaa~ you're so cute", "tail wiggle for you ♡", "scritches for Eunice?", "I'm sleepy, wanna nap?", "psst... smile for me ♡", "meow meow, I love you!", "I sat on your heart ♡", "your smile is purr-fect", "stay for a little longer?", "have you eaten yet, Baby?", "hello, pretty ♡", "you're my favorite human"] },
-      { name: "the bunny",     sticker: "usagi",     emoji: "🐰", speed: 52, trail: "🤍", say: ["hop hop ♡", "carrots for kisses?", "so happy for you two!", "boing boing ♡", "I hopped all the way here!", "you're the cutest, Baby", "hugs and carrots for you", "wiggle wiggle ♡", "yay! 4 months!", "I believe in you, Eunice!", "want to hop with me?", "you're blooming like a peony", "don't forget to smile ♡", "tiny hop of happiness!", "sending you a hop-kiss", "you make my heart go thump", "stay cozy, okay?", "more days, more hops ♡"] }
+      { name: "the bear",  sticker: "chiikawa",  emoji: "🐻", speed: 28, trail: "💗", hints: ["the big ♥ below is ticklish", "psst... tap the big ♥ 10 times", "I heard the big ♥ has a secret"], say: ["bear hug! ♡", "I love you Baby ♡", "happy 4 months!", "hugs are free here ♡", "squish me, Baby ♡", "one hug, coming right up!", "you're my favorite person", "I'd share my honey with you", "warm hugs for Eunice ♡", "you did great today ♡", "drink some water, Baby!", "I saved you a cozy spot", "you're so loved, you know?", "grrr... I mean, I love you", "snuggle time?", "I'll guard your heart ♡", "4 months of cuddles!", "nap with me later?", "you make everything softer ♡"] },
+      { name: "the cat", sticker: "hachiware", emoji: "🐱", speed: 40, trail: "🩷", hints: ["I smell a secret near the big ♥", "tap the big ♥ ten times, shh!", "the big ♥ at the bottom... tap tap"], say: ["meow ♡", "happy 4 months!", "Eunice is the prettiest ♡", "pet me, Baby!", "purr purr purr~", "mrrp? I mean, I love you", "head pats, please ♡", "nyaa~ you're so cute", "tail wiggle for you ♡", "scritches for Eunice?", "I'm sleepy, wanna nap?", "psst... smile for me ♡", "meow meow, I love you!", "I sat on your heart ♡", "your smile is purr-fect", "stay for a little longer?", "have you eaten yet, Baby?", "hello, pretty ♡", "you're my favorite human"] },
+      { name: "the bunny",     sticker: "usagi",     emoji: "🐰", speed: 52, trail: "🤍", hints: ["the big ♥ is hiding something", "have you poked the big ♥ yet?", "10 pokes on the big ♥... shh!"], say: ["hop hop ♡", "carrots for kisses?", "so happy for you two!", "boing boing ♡", "I hopped all the way here!", "you're the cutest, Baby", "hugs and carrots for you", "wiggle wiggle ♡", "yay! 4 months!", "I believe in you, Eunice!", "want to hop with me?", "you're blooming like a peony", "don't forget to smile ♡", "tiny hop of happiness!", "sending you a hop-kiss", "you make my heart go thump", "stay cozy, okay?", "more days, more hops ♡"] }
     ];
+
+    // ----- little helpers for the chibis -----
+    function speak(c, text, ms = 2000) {
+      c.bubble.textContent = text;
+      c.el.classList.add("talking");
+      clearTimeout(c.talkTimer);
+      c.talkTimer = setTimeout(() => c.el.classList.remove("talking"), ms);
+    }
+    function placeCritter(c) {
+      c.el.style.transform = "translate(" + c.x + "px, " + -c.y + "px)";
+      c.flip.style.transform = "scaleX(" + (c.dir > 0 ? -1 : 1) + ")";
+    }
+    function makeZ(c) {
+      const z = document.createElement("span");
+      z.className = "zzz";
+      z.textContent = pick(["z", "Z", "Zz"]);
+      c.el.appendChild(z);
+      setTimeout(() => z.remove(), 2600);
+    }
+    function fallAsleep(c) {
+      if (c.sleeping || c.dragging || c.hugging) return;
+      speak(c, "*yaaawn* ...zzz", 1800);
+      setTimeout(() => {
+        if (c.sleeping || c.dragging || c.hugging) return;
+        c.sleeping = true;
+        c.el.classList.add("sleeping", "paused");
+        c.zzzTimer = setInterval(() => makeZ(c), 1500);
+      }, 1500);
+    }
+    function wakeUp(c) {
+      c.sleeping = false;
+      clearInterval(c.zzzTimer);
+      c.el.classList.remove("sleeping");
+    }
+    function landed(c) {
+      c.el.classList.remove("landed");
+      void c.el.offsetWidth;
+      c.el.classList.add("landed");
+      setTimeout(() => c.el.classList.remove("landed"), 400);
+      if (c.dropSpeech) {
+        c.dropSpeech = false;
+        speak(c, pick(landLines), 1600);
+        c.pause = 1.2;
+        c.el.classList.add("paused");
+      }
+    }
+
+    const pickupLines = ["wheee! ♡", "put me down gently~", "I'm flying!", "hehe, that tickles"];
+    const landLines = ["boing!", "ta-da! ♡", "oof! I'm okay ♡", "again, again!"];
+    const wakeLines = ["mmm... five more minutes ♡", "huh? oh, hi Baby ♡", "*sleepy hug* ♡"];
 
     critterList.forEach((info, i) => {
       const el = document.createElement("button");
@@ -1179,29 +1384,81 @@ Your Baby ♡</p>
         flip: el.querySelector(".flip"),
         bubble: el.querySelector(".bubble"),
         x: 90 + i * 150,
+        y: 0,            // how high above the ground (when carried or dropped)
+        vy: 0,           // falling speed
         dir: i % 2 === 0 ? 1 : -1,
         speed: info.speed,
         pause: 0,
         lastPrint: 90 + i * 150,
         info: info,
-        talkTimer: null
+        talkTimer: null,
+        dragging: false,
+        sleeping: false
       };
       critters.push(c);
 
-      // click a critter: it hops, says something and throws hearts
+      // ----- pick me up! press and drag to carry a chibi around -----
+      el.addEventListener("pointerdown", (e) => {
+        if (c.hugging) return;
+        c.pressed = true;
+        c.moved = false;
+        c.startX = e.clientX;
+        c.startY = e.clientY;
+        el.setPointerCapture(e.pointerId);
+      });
+      el.addEventListener("pointermove", (e) => {
+        if (!c.pressed) return;
+        if (!c.moved && Math.hypot(e.clientX - c.startX, e.clientY - c.startY) > 8) {
+          c.moved = true;
+          c.dragging = true;
+          c.dropSpeech = true;
+          if (c.sleeping) wakeUp(c);
+          el.classList.add("held");
+          el.classList.remove("paused");
+          speak(c, pick(pickupLines), 1500);
+        }
+        if (c.dragging) {
+          c.x = e.clientX - el.offsetWidth / 2;
+          c.y = Math.max(0, window.innerHeight - e.clientY - el.offsetHeight / 2 - 4);
+          c.vy = 0;
+          if (calm) placeCritter(c);
+        }
+      });
+      const letGo = () => {
+        if (!c.pressed) return;
+        c.pressed = false;
+        if (c.dragging) {
+          c.dragging = false;
+          el.classList.remove("held");
+          c.justDragged = true; // so letting go doesn't also count as a tap
+          setTimeout(() => { c.justDragged = false; }, 80);
+          if (calm) { c.y = 0; c.vy = 0; placeCritter(c); }
+        }
+      };
+      el.addEventListener("pointerup", letGo);
+      el.addEventListener("pointercancel", letGo);
+
+      // ----- tap a chibi: it hops, says something and throws hearts -----
       el.addEventListener("click", () => {
+        if (c.justDragged) return;
+        if (c.sleeping) {                       // tapping a sleeping chibi wakes it up (for a little while)
+          wakeUp(c);
+          speak(c, pick(wakeLines), 2200);
+          c.pause = 2;
+          if (isNight) setTimeout(() => fallAsleep(c), 14000);
+          return;
+        }
         el.classList.remove("hop");
         void el.offsetWidth; // restart the animation
         el.classList.add("hop");
-        let line = pick(info.say);
-        while (line === c.lastLine) line = pick(info.say); // never say the same thing twice in a row
+        // sometimes (until she finds the secret) a chibi drops a hint about the big heart
+        const pool = (!eggFound && Math.random() < 0.3) ? info.hints : info.say;
+        let line = pick(pool);
+        while (line === c.lastLine) line = pick(pool); // never say the same thing twice in a row
         c.lastLine = line;
-        c.bubble.textContent = line;
-        el.classList.add("talking");
+        speak(c, line);
         c.pause = 2.2;
         el.classList.add("paused");
-        clearTimeout(c.talkTimer);
-        c.talkTimer = setTimeout(() => el.classList.remove("talking"), 2000);
         const r = el.getBoundingClientRect();
         burst(r.left + r.width / 2, r.top, 8);
       });
@@ -1209,6 +1466,9 @@ Your Baby ♡</p>
         if (ev.animationName === "hop") el.classList.remove("hop");
       });
     });
+
+    // at night the chibis yawn and fall asleep, one after another
+    if (isNight) critters.forEach((c, i) => setTimeout(() => fallAsleep(c), 3000 + i * 2500));
 
     applyFallbackArt(critterLayer);
     applyStickers(critterLayer);
@@ -1231,10 +1491,26 @@ Your Baby ♡</p>
       const maxX = Math.max(minX + 60, window.innerWidth - 110);
 
       critters.forEach((c) => {
-        if (c.hugging) {
+        // falling after being dropped: simple gravity with a little bounce
+        if (!c.dragging && (c.y > 0 || c.vy !== 0)) {
+          c.vy -= 2400 * dt;
+          c.y += c.vy * dt;
+          if (c.y <= 0) {
+            c.y = 0;
+            if (c.vy < -260) { c.vy = -c.vy * 0.45; landed(c); } else { c.vy = 0; }
+          }
+        }
+
+        if (c.dragging) {
+          // being carried: the finger or mouse decides where it is
+        } else if (c.hugging) {
           c.x += (c.targetX - c.x) * Math.min(1, dt * 5); // slide to the middle for the group hug
           c.dir = -1;                                      // face the screen
           c.lastPrint = c.x;
+        } else if (c.sleeping) {
+          // fast asleep, staying put
+        } else if (c.y > 0) {
+          c.x = Math.min(window.innerWidth - 70, Math.max(10, c.x)); // falling: keep it on screen
         } else if (c.pause > 0) {
           c.pause -= dt;
           if (c.pause <= 0) c.el.classList.remove("paused");
@@ -1246,8 +1522,7 @@ Your Baby ♡</p>
           if (Math.random() < dt * 0.05) c.dir *= -1; // sometimes turn around
           if (Math.abs(c.x - c.lastPrint) > 50) { dropPrint(c); c.lastPrint = c.x; }
         }
-        c.el.style.transform = "translateX(" + c.x + "px)";
-        c.flip.style.transform = "scaleX(" + (c.dir > 0 ? -1 : 1) + ")";
+        placeCritter(c);
       });
       requestAnimationFrame(walk);
     }
@@ -1265,7 +1540,46 @@ Your Baby ♡</p>
     const audioStatus = document.getElementById("audioStatus");
     const songToggle = document.getElementById("songToggle");
 
+    // ----- typewriter: the letter writes itself when she opens it -----
+    const letterBody = secretLetter.querySelector("p");
+    const letterSkip = document.getElementById("skipTyping");
+    const fullLetter = letterBody.textContent;
+    letterBody.textContent = ""; // we type it out when she opens it
+    let letterStarted = false;
+    let typingTimer = null;
+
+    function finishTyping() {
+      clearTimeout(typingTimer);
+      letterBody.textContent = fullLetter;
+      letterBody.classList.remove("typing");
+      letterSkip.hidden = true;
+    }
+    function typeLetter() {
+      letterStarted = true;
+      if (calm) { finishTyping(); return; }
+      letterBody.classList.add("typing");
+      letterSkip.hidden = false;
+      const node = document.createTextNode("");
+      letterBody.textContent = "";
+      letterBody.appendChild(node);
+      let i = 0;
+      function step() {
+        if (i >= fullLetter.length) { finishTyping(); return; }
+        const ch = fullLetter[i++];
+        node.data = fullLetter.slice(0, i);
+        let delay = 16;                                         // normal letters
+        if (ch === "." || ch === "!" || ch === "?") delay = 150; // a pause at the end of a sentence
+        else if (ch === "," || ch === ";") delay = 80;
+        else if (ch === "\n") delay = 200;
+        typingTimer = setTimeout(step, delay);
+      }
+      step();
+    }
+    letterSkip.addEventListener("click", finishTyping);
+
     openLetterButton.addEventListener("click", async (e) => {
+      secretLetter.classList.add("show");
+      if (!letterStarted) typeLetter();
       secretLetter.classList.add("show");
       openLetterButton.textContent = "Your letter is open ♡";
       secretLetter.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1324,6 +1638,8 @@ Your Baby ♡</p>
     const extraDays = Math.round((today - monthsaryDate(monthsDone)) / 86400000);
     const nextDate = monthsaryDate(monthsDone + 1);
     const daysToNext = Math.round((nextDate - today) / 86400000);
+    const monthsaryToday = (monthsDone > 0 && extraDays === 0) || preview === "monthsary";
+    const heroEyebrow = document.getElementById("heroEyebrow");
 
     if (today < START) {
       daysSub.textContent = "We start counting on July 31, 2026 ♡";
@@ -1398,12 +1714,51 @@ Your Baby ♡</p>
       });
     });
 
-    /* ========== OPEN WHEN... ENVELOPES ========== */
+    /* ========== OPEN WHEN... ENVELOPES (with a counter and a secret 13th one) ========== */
+    const envCards = Array.from(document.querySelectorAll(".env-card:not(.env-secret)"));
+    const secretEnvelope = document.getElementById("secretEnvelope");
+    const envProgress = document.getElementById("envProgress");
+    let openedList = loadSaved("monthsary-opened", []); // which envelopes she has opened before (saved on her device)
+
+    function updateEnvProgress() {
+      const done = openedList.length;
+      if (done >= envCards.length) {
+        envProgress.textContent = "all " + envCards.length + " opened ♡ you found the secret one!";
+      } else {
+        envProgress.textContent = done + " of " + envCards.length + " opened · open them all for a surprise ♡";
+      }
+    }
+    function unlockSecretEnvelope(celebrate) {
+      secretEnvelope.hidden = false;
+      if (celebrate) {
+        secretEnvelope.classList.add("appear");
+        secretEnvelope.scrollIntoView({ behavior: "smooth", block: "center" });
+        rain();
+        showToast("a secret envelope appeared ♡");
+      }
+    }
+
+    envCards.forEach((card, i) => {
+      card.style.setProperty("--w", -i * 0.9 + "s"); // so they don't all wiggle at the same moment
+      if (openedList.includes(i)) card.classList.add("opened");
+    });
+    updateEnvProgress();
+    if (openedList.length >= envCards.length) unlockSecretEnvelope(false);
+
     document.querySelectorAll(".env").forEach((btn) => {
       btn.addEventListener("click", () => {
         const card = btn.closest(".env-card");
         const open = card.classList.toggle("open");
         btn.setAttribute("aria-expanded", open);
+        if (!open) return;
+        card.classList.add("opened"); // stops its wiggling
+        const i = envCards.indexOf(card);
+        if (i !== -1 && !openedList.includes(i)) {
+          openedList.push(i);
+          storeSaved("monthsary-opened", openedList);
+          updateEnvProgress();
+          if (openedList.length === envCards.length) setTimeout(() => unlockSecretEnvelope(true), 900);
+        }
       });
     });
 
@@ -1640,6 +1995,9 @@ Your Baby ♡</p>
 
       reasonNum.textContent = "Reason " + pulled + " of " + reasons.length + " ♡";
       reasonText.textContent = reasons[index];
+      currentReason = reasons[index];
+      favBtn.hidden = false;
+      updateFavBtn();
       reasonCount.textContent = bag.length === 0 ? "You found every reason! (I have so many more, though ♡)" : "";
 
       jarBtn.classList.remove("shake");
@@ -1651,6 +2009,146 @@ Your Baby ♡</p>
       const r = jarBtn.getBoundingClientRect();
       burst(r.left + r.width / 2, r.top, 8);
     });
+
+    // ----- favorites: she can save reasons, and they stay saved on her device -----
+    const favBtn = document.getElementById("favBtn");
+    const favBox = document.getElementById("favBox");
+    const favList = document.getElementById("favList");
+    let favorites = loadSaved("monthsary-favorites", []); // a list of the saved reasons (their text)
+    let currentReason = "";
+
+    function updateFavBtn() {
+      const saved = favorites.includes(currentReason);
+      favBtn.textContent = saved ? "♥ saved" : "♡ save";
+      favBtn.classList.toggle("saved", saved);
+      favBtn.setAttribute("aria-pressed", saved);
+    }
+    function renderFavorites() {
+      favList.innerHTML = "";
+      favBox.hidden = favorites.length === 0;
+      favorites.forEach((text) => {
+        const li = document.createElement("li");
+        const words = document.createElement("span");
+        words.textContent = text;
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "✕";
+        remove.setAttribute("aria-label", "Remove from favorites");
+        remove.addEventListener("click", () => {
+          favorites = favorites.filter((f) => f !== text);
+          storeSaved("monthsary-favorites", favorites);
+          renderFavorites();
+          updateFavBtn();
+        });
+        li.appendChild(words);
+        li.appendChild(remove);
+        favList.appendChild(li);
+      });
+    }
+    favBtn.addEventListener("click", () => {
+      if (!currentReason) return;
+      if (favorites.includes(currentReason)) {
+        favorites = favorites.filter((f) => f !== currentReason);
+      } else {
+        favorites.push(currentReason);
+        const r = favBtn.getBoundingClientRect();
+        burst(r.left + r.width / 2, r.top, 6);
+      }
+      storeSaved("monthsary-favorites", favorites);
+      renderFavorites();
+      updateFavBtn();
+    });
+    renderFavorites();
+
+    /* ========== MY PLAYLIST (Spotify) ========== */
+    // Paste your Spotify playlist link between the quotes. While it is "", this whole section stays hidden.
+    const PLAYLIST_URL = "";
+    // Optional: type the playlist's name yourself. If you leave it "", the page asks Spotify for it.
+    const PLAYLIST_NAME = "";
+    // The cover picture comes from Spotify by itself. If it doesn't show up, save the cover as
+    // "playlist-cover.jpg" next to index.html and the page will use that instead.
+
+    // turns a normal Spotify link into the link that can be shown inside the page
+    function spotifyEmbedUrl(url) {
+      const m = url.match(/open\.spotify\.com\/(playlist|album|track)\/([A-Za-z0-9]+)/);
+      return m ? "https://open.spotify.com/embed/" + m[1] + "/" + m[2] : "";
+    }
+
+    const playlistSection = document.getElementById("playlist");
+    const playlistSleeve = document.getElementById("playlistSleeve");
+    const playlistCover = document.getElementById("playlistCover");
+    const playlistNow = document.getElementById("playlistNow");
+    const playlistName = document.getElementById("playlistName");
+    const playlistOpen = document.getElementById("playlistOpen");
+    const playlistHere = document.getElementById("playlistHere");
+    const playlistEmbed = document.getElementById("playlistEmbed");
+
+    // ?preview=playlist shows the design even before you paste your link
+    const playlistLink = PLAYLIST_URL || (preview === "playlist" ? "preview" : "");
+
+    if (playlistLink) {
+      playlistSection.hidden = false;
+
+      if (playlistLink === "preview") {
+        playlistSleeve.removeAttribute("href");
+        playlistOpen.removeAttribute("href");
+        playlistName.textContent = "your playlist name shows here";
+        playlistNow.hidden = false;
+      } else {
+        playlistSleeve.href = playlistLink;
+        playlistOpen.href = playlistLink;
+      }
+
+      function showName(name) {
+        playlistName.textContent = name;
+        playlistNow.hidden = false;
+      }
+      function setCover(img) {
+        playlistCover.innerHTML = "";
+        playlistCover.appendChild(img);
+      }
+      if (PLAYLIST_NAME) showName(PLAYLIST_NAME);
+
+      // 1) your own picture, if you saved one
+      let haveOwnCover = false;
+      const ownCover = new Image();
+      ownCover.alt = "Our playlist cover";
+      ownCover.onload = () => { haveOwnCover = true; setCover(ownCover); };
+      ownCover.src = "playlist-cover.jpg";
+
+      // 2) otherwise ask Spotify for the playlist's cover and name
+      if (playlistLink !== "preview" && playlistLink.includes("spotify.com")) {
+        fetch("https://open.spotify.com/oembed?url=" + encodeURIComponent(playlistLink))
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.thumbnail_url && !haveOwnCover) {
+              const img = new Image();
+              img.alt = "Our playlist cover";
+              img.onload = () => { if (!haveOwnCover) setCover(img); };
+              img.src = data.thumbnail_url;
+            }
+            if (data.title && !PLAYLIST_NAME) showName(data.title);
+          })
+          .catch(() => { /* no internet or blocked: the pink cover stays, nothing breaks */ });
+      }
+
+      // "play it right here" opens Spotify's little player inside the page
+      const embedUrl = spotifyEmbedUrl(playlistLink);
+      if (!embedUrl) playlistHere.hidden = true;
+      playlistHere.addEventListener("click", () => {
+        if (!playlistEmbed.firstChild) {
+          const frame = document.createElement("iframe");
+          frame.src = embedUrl;
+          frame.height = playlistLink.includes("/track/") ? "152" : "352";
+          frame.loading = "lazy";
+          frame.title = "Our playlist";
+          frame.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+          playlistEmbed.appendChild(frame);
+        }
+        playlistEmbed.hidden = !playlistEmbed.hidden;
+        playlistHere.textContent = playlistEmbed.hidden ? "or play it right here" : "hide the player";
+      });
+    }
 
     /* ========== HUG THE BEAR ========== */
     const hugBear = document.getElementById("hugBear");
@@ -1694,18 +2192,29 @@ Your Baby ♡</p>
     const hugGlow = document.getElementById("hugGlow");
     let groupHugging = false;
 
-    function groupHug(count) {
+    let toastTimer = null;
+    function showToast(text, ms = 3000) {   // a little pill at the top of the screen
+      hugToast.textContent = text;
+      hugToast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { if (!groupHugging) hugToast.classList.remove("show"); }, ms);
+    }
+
+    function groupHug(label) {
       if (groupHugging) return;
       groupHugging = true;
-      hugToast.textContent = count + " hugs!! group hug time ♡";
+      hugToast.textContent = label;
       hugToast.classList.add("show");
       hugGlow.classList.add("show");
 
       const w = window.innerWidth;
-      const bigScale = Math.min(4.2, w / 230);        // smaller on phones so all three fit
+      const bigScale = Math.min(4.2, w / 180);        // a bit smaller on phones so all three fit
       const spread = Math.min(230, w / 3.2);
       critters.forEach((c, i) => {
         c.hugging = true;
+        c.dragging = false;
+        c.el.classList.remove("held");
+        if (c.sleeping) wakeUp(c);
         c.targetX = w / 2 - 30 + (i - 1) * spread;      // left, middle, right
         c.el.classList.remove("paused", "talking");
         c.el.style.setProperty("--s", bigScale);
@@ -1726,6 +2235,7 @@ Your Baby ♡</p>
           c.hugging = false;
           c.el.classList.remove("embrace");
           c.el.style.removeProperty("--s");
+          if (isNight) setTimeout(() => fallAsleep(c), 4000);
         });
         hugToast.classList.remove("show");
         hugGlow.classList.remove("show");
@@ -1748,11 +2258,46 @@ Your Baby ♡</p>
 
       const milestone = hugs % 5 === 0 && hugs <= 40; // 5, 10, 15 ... 40
       playHugSound(milestone);
-      if (milestone) groupHug(hugs);
+      if (milestone) groupHug(hugs + " hugs!! group hug time ♡");
 
       const r = hugBear.getBoundingClientRect();
       burst(r.left + r.width / 2, r.top + r.height / 3, 10);
     });
+
+    /* ========== SECRET: tap the big heart 10 times ========== */
+    const bigHeart = document.getElementById("bigHeart");
+    const secretMsg = document.getElementById("secretMsg");
+    let heartTaps = 0;
+    eggFound = loadSaved("monthsary-egg", false);
+    if (eggFound) secretMsg.hidden = false;
+
+    bigHeart.addEventListener("click", () => {
+      heartTaps++;
+      bigHeart.classList.remove("thump");
+      void bigHeart.offsetWidth;
+      bigHeart.classList.add("thump");
+      const r = bigHeart.getBoundingClientRect();
+      burst(r.left + r.width / 2, r.top + r.height / 2, 4);
+      if (!eggFound && heartTaps === 5) showToast("keep going... ♡", 1500);
+      if (!eggFound && heartTaps >= 10) {
+        eggFound = true;                       // the chibis stop dropping hints now
+        storeSaved("monthsary-egg", true);
+        secretMsg.hidden = false;
+        secretMsg.scrollIntoView({ behavior: "smooth", block: "center" });
+        burst(r.left + r.width / 2, r.top + r.height / 2, 16);
+        rain();
+        showToast("you found the secret ♡");
+      }
+    });
+
+    /* ========== MONTHSARY DAY SURPRISE ========== */
+    if (monthsaryToday) {
+      const monthsaryNumber = (monthsDone > 0 && extraDays === 0) ? monthsDone : 4; // (4 when previewing)
+      heroEyebrow.textContent = "Happy " + ordinal(monthsaryNumber) + " monthsary today, Baby ♡";
+      heroEyebrow.classList.add("today");
+      [1200, 3800, 6400].forEach((ms) => setTimeout(rain, ms));   // three waves of falling hearts
+      setTimeout(() => groupHug("Happy " + ordinal(monthsaryNumber) + " monthsary, Baby! ♡"), 1800);
+    }
   </script>
 
 </body>
