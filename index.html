@@ -59,6 +59,8 @@
     .brand { font-family: "Playfair Display", serif; font-size: 1.2rem; letter-spacing: .04em; }
     .brand span { color: #f2b9b4; transition: color .3s; }
     .topbar.scrolled .brand span { color: var(--pink); }
+    .brand .brand-pre, .topbar.scrolled .brand .brand-pre { color: inherit; }
+    .brand, .nav a { white-space: nowrap; }
     .nav { display: flex; gap: 8px; font-size: .82rem; font-weight: 600; }
     .nav a { padding: 6px 12px; border-radius: 99px; opacity: .92; transition: background .2s, transform .2s; }
     .nav a:hover { background: rgba(255,255,255,.2); transform: translateY(-2px); }
@@ -70,8 +72,8 @@
       display: grid; place-items: center; text-align: center; color: white;
       padding: 110px 22px 80px; overflow: hidden;
       background:
-        linear-gradient(115deg, rgba(91, 49, 70, .38), rgba(174, 112, 139, .22)),
-        url("https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=2000&q=85") center center / cover no-repeat;
+        linear-gradient(115deg, rgba(91, 49, 70, .82), rgba(174, 112, 139, .58)),
+        url("https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=2000&q=85") center/cover;
     }
     .hero::before, .hero::after {
       content: ""; position: absolute; border: 1px solid rgba(255,255,255,.2);
@@ -393,9 +395,9 @@
     .secret-msg p { margin: 0; font: 700 1.5rem/1.4 "Caveat", cursive; color: #fff; }
 
     /* ============ MY PLAYLIST (Spotify cover, record sleeve) ============ */
-    .playlist-section { --bg: #fffdfd; }
+    .playlist-section { --bg: #fffdfd; overflow-x: clip; }
     .sleeve-wrap { position: relative; isolation: isolate; max-width: 520px; margin: 78px auto 0; }
-    .sleeve-wrap::before { content: ""; position: absolute; left: 50%; top: 0; width: 440px; height: 440px; translate: -50% -4%; background: radial-gradient(circle, #ffe3ec, transparent 65%); z-index: -1; }
+    .sleeve-wrap::before { content: ""; position: absolute; left: 50%; top: 0; width: min(440px, 100vw); height: 440px; translate: -50% -4%; background: radial-gradient(circle, #ffe3ec, transparent 65%); z-index: -1; }
     .sleeve { position: relative; display: block; width: min(250px, 66vw); aspect-ratio: 1; margin: 0 auto; translate: -26px 0; }
     .record {
       position: absolute; top: 4%; left: 28%; width: 92%; height: 92%; border-radius: 50%; display: grid; place-items: center;
@@ -438,7 +440,19 @@
     .hug-bear .sticker-art { width: 4.4rem; margin: auto; }
     .floating .sticker-art { width: 2.6rem; }
     .sticker .sticker-art { width: 2.8rem; }
-    @media (max-width: 760px) { .critter .sticker-art { width: 2.9rem; } }
+    @media (max-width: 760px) {
+      .critter .sticker-art { width: 2.6rem; }
+      .f3, .f4 { display: none; }   /* these two sat on top of the hero text on small screens */
+    }
+    @media (max-width: 520px) {
+      .brand-pre { display: none; }
+      .nav { gap: 0; }
+      .nav a { padding: 5px 6px; font-size: .68rem; }
+    }
+    @media (max-width: 380px) {
+      .brand { display: none; }   /* on very narrow phones the menu gets the whole bar */
+      .topbar { justify-content: center; }
+    }
 
     /* ============ CLICK SPARKLES, CURSOR TRAIL & CONFETTI ============ */
     .fx { position: fixed; inset: 0; pointer-events: none; z-index: 70; overflow: hidden; }
@@ -629,7 +643,7 @@
   <span class="progress-cat" id="progressCat" aria-hidden="true" data-sticker="hachiware">🐱</span>
 
   <header class="topbar" id="topbar">
-    <a class="brand" href="#home">a diary for <span>Eunice ♡</span></a>
+    <a class="brand" href="#home"><span class="brand-pre">a diary for </span><span>Eunice ♡</span></a>
     <nav class="nav" aria-label="Main navigation">
       <a href="#letter">A little note</a>
       <a href="#media">Our memories</a>
