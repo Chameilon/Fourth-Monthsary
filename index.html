@@ -696,6 +696,30 @@
     .twinkle { color: #F2C4D4; }
     .secret-msg { background: rgba(242, 239, 227, .12); }
 
+    /* ============ CUTE CHIBI MOVES: blinking, ear flicks, tail wags, expressions ============ */
+    .sticker-art .eyes-open, .sticker-art .ear-l, .sticker-art .ear-r, .sticker-art .tail, .sticker-art .sparkle { transform-box: fill-box; }
+    .sticker-art .eyes-open { transform-origin: center; animation: blink 4.5s ease-in-out infinite; animation-delay: var(--d, 0s); }
+    @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.08); } }
+    .sticker-art .ear-l { transform-origin: 100% 100%; animation: earflick 5s ease-in-out infinite; animation-delay: var(--d, 0s); }
+    .sticker-art .ear-r { transform-origin: 0% 100%; animation: earflick 5s ease-in-out infinite; animation-delay: calc(var(--d, 0s) - 1.2s); }
+    @keyframes earflick { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-9deg); } 95% { transform: rotate(4deg); } }
+    .sticker-art .tail { transform-origin: 0% 100%; animation: tailwag 1.8s ease-in-out infinite; }
+    @keyframes tailwag { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(9deg); } }
+    .sticker-art .sparkle { transform-origin: center; animation: twinkle 2.8s ease-in-out infinite; }
+    .sticker-art .eyes-happy, .sticker-art .eyes-sleep, .sticker-art .mouth-o { display: none; }
+    .critter.hop .eyes-open, .critter.embrace .eyes-open, .critter.landed .eyes-open, .pal:hover .eyes-open, .critter:hover .eyes-open { display: none; }
+    .critter.hop .eyes-happy, .critter.embrace .eyes-happy, .critter.landed .eyes-happy, .pal:hover .eyes-happy, .critter:hover .eyes-happy { display: inline; }
+    .critter.sleeping .eyes-open, .critter.sleeping:hover .eyes-happy { display: none; }
+    .critter.sleeping .eyes-sleep, .critter.sleeping:hover .eyes-sleep { display: inline; }
+    .critter.held .eyes-happy { display: none; }
+    .critter.held .eyes-open { display: inline; }
+    .critter.held .mouth-smile { display: none; }
+    .critter.held .mouth-o { display: inline; }
+
+    /* ============ SOUND BUTTON ============ */
+    .sound-toggle { position: fixed; right: 14px; bottom: 76px; z-index: 55; width: 42px; height: 42px; border-radius: 50%; border: 1px dashed var(--deep-rose); background: var(--beige); font-size: 1.1rem; line-height: 1; cursor: pointer; box-shadow: 0 6px 16px rgba(90, 68, 82, .18); transition: transform .2s; }
+    .sound-toggle:hover { transform: scale(1.1); }
+
     /* ============ PHONES ============ */
     @media (max-width: 760px) {
       .media-grid { grid-template-columns: 1fr; }
@@ -1166,6 +1190,7 @@ Your Baby ♡</p>
   <!-- layers for the walking critters and the sparkle effects -->
   <div class="critter-layer" id="critterLayer"></div>
   <div class="fx" id="fx" aria-hidden="true"></div>
+  <button class="sound-toggle" id="soundToggle" type="button" data-own-burst title="Sound effects on/off">🔊</button>
   <div class="hug-glow" id="hugGlow" aria-hidden="true"></div>
   <div class="hug-toast" id="hugToast" aria-live="polite"></div>
 
@@ -1235,48 +1260,91 @@ Your Baby ♡</p>
     });
 
     /* ========== ORIGINAL STICKER DRAWINGS (used until your own PNGs are found) ========== */
-    const LINE = 'stroke="#7a5a69" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"';
-    const FACE = (y) =>
-      '<circle cx="38" cy="' + y + '" r="3.4" fill="#5a3a48"/><circle cx="62" cy="' + y + '" r="3.4" fill="#5a3a48"/>' +
-      '<ellipse cx="29" cy="' + (y + 9) + '" rx="6" ry="4" fill="#ffb3c7" opacity=".85"/>' +
-      '<ellipse cx="71" cy="' + (y + 9) + '" rx="6" ry="4" fill="#ffb3c7" opacity=".85"/>';
-    const BODY = (fill) =>
-      '<ellipse cx="36" cy="90" rx="9" ry="6" fill="' + fill + '"/><ellipse cx="64" cy="90" rx="9" ry="6" fill="' + fill + '"/>' +
-      '<ellipse cx="50" cy="60" rx="33" ry="30" fill="' + fill + '"/>' +
-      '<ellipse cx="19" cy="68" rx="6" ry="8" fill="' + fill + '"/><ellipse cx="81" cy="68" rx="6" ry="8" fill="' + fill + '"/>';
+    // Each chibi has big shiny eyes, blush, and three "expressions" that CSS switches between:
+    // normal (blinking), happy ^ ^ (when tapped or hugging), and sleepy (at night).
+    const LINE = 'stroke="#6b4a5a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"';
+    const INK = "#4a3340";
+
+    function eyes(x1, x2, y, rx, ry) {
+      const open = (x) =>
+        '<ellipse cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="' + INK + '"/>' +
+        '<circle cx="' + (x + rx * 0.35) + '" cy="' + (y - ry * 0.38) + '" r="' + (rx * 0.38) + '" fill="#fff"/>' +
+        '<circle cx="' + (x - rx * 0.32) + '" cy="' + (y + ry * 0.45) + '" r="' + (rx * 0.18) + '" fill="#fff"/>';
+      const happy = (x) =>
+        '<path d="M' + (x - rx) + ' ' + (y + 1.5) + ' Q' + x + ' ' + (y - ry * 1.15) + ' ' + (x + rx) + ' ' + (y + 1.5) +
+        '" fill="none" stroke="' + INK + '" stroke-width="2.6" stroke-linecap="round"/>';
+      const sleepy = (x) =>
+        '<path d="M' + (x - rx) + ' ' + (y - 0.5) + ' Q' + x + ' ' + (y + ry * 0.8) + ' ' + (x + rx) + ' ' + (y - 0.5) +
+        '" fill="none" stroke="' + INK + '" stroke-width="2.4" stroke-linecap="round"/>';
+      return '<g class="eyes-open">' + open(x1) + open(x2) + '</g>' +
+             '<g class="eyes-happy">' + happy(x1) + happy(x2) + '</g>' +
+             '<g class="eyes-sleep">' + sleepy(x1) + sleepy(x2) + '</g>';
+    }
+    function cheeks(x1, x2, y) {
+      return '<ellipse cx="' + x1 + '" cy="' + y + '" rx="6.5" ry="4" fill="#FFB3C7" opacity=".85"/>' +
+             '<ellipse cx="' + x2 + '" cy="' + y + '" rx="6.5" ry="4" fill="#FFB3C7" opacity=".85"/>';
+    }
+    function mouth(smilePath, cx, cy) {
+      return '<g class="mouth-smile"><path d="' + smilePath + '" fill="none" stroke="' + INK + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>' +
+             '<g class="mouth-o"><ellipse cx="' + cx + '" cy="' + cy + '" rx="2.8" ry="3.4" fill="#C9738F"/></g>';
+    }
+    function feetAndArms(fill) {
+      return '<ellipse cx="37" cy="92" rx="9.5" ry="5.5" fill="' + fill + '"/><ellipse cx="63" cy="92" rx="9.5" ry="5.5" fill="' + fill + '"/>';
+    }
+    function bodyAndArms(fill) {
+      return '<ellipse cx="50" cy="76" rx="22" ry="17" fill="' + fill + '"/>' +
+             '<ellipse cx="28" cy="75" rx="5.5" ry="7.5" fill="' + fill + '" transform="rotate(12 28 75)"/>' +
+             '<ellipse cx="72" cy="75" rx="5.5" ry="7.5" fill="' + fill + '" transform="rotate(-12 72 75)"/>';
+    }
+    const SPARKLE = (x, y, d) => '<path class="sparkle" style="animation-delay:' + d + 's" d="M' + x + ' ' + (y - 5) + ' l1.6 3.4 l3.4 1.6 l-3.4 1.6 l-1.6 3.4 l-1.6 -3.4 l-3.4 -1.6 l3.4 -1.6 z" fill="#FFE29A"/>';
 
     const stickerArt = {
       cat:
+        '<g class="tail"><path d="M74 84 C90 90 99 76 93 62" fill="none" stroke="#6b4a5a" stroke-width="6.4" stroke-linecap="round"/>' +
+        '<path d="M74 84 C90 90 99 76 93 62" fill="none" stroke="#FFF8F1" stroke-width="3.4" stroke-linecap="round"/></g>' +
         '<g ' + LINE + '>' +
-        '<path d="M78 76 C98 76 98 52 88 48" fill="none"/>' +
-        '<path d="M22 44 L20 14 L45 31 Z" fill="#fffaf5"/><path d="M78 44 L80 14 L55 31 Z" fill="#fffaf5"/>' +
-        BODY("#fffaf5") +
-        '<path d="M44 65 Q47 69 50 65 Q53 69 56 65" fill="none"/></g>' +
-        '<path d="M25 36 L24 22 L36 31 Z" fill="#ffc2d4"/><path d="M75 36 L76 22 L64 31 Z" fill="#ffc2d4"/>' +
-        FACE(58) +
-        '<path d="M70 24 L60 17 L60 31 Z" fill="#ff9ebb"/><path d="M70 24 L80 17 L80 31 Z" fill="#ff9ebb"/><circle cx="70" cy="24" r="3.5" fill="#ff7aa2"/>',
+        '<g class="ear-l"><path d="M20 42 L17 12 Q17 8.5 20.5 10.5 L43 27 Z" fill="#FFF8F1"/><path d="M24 34 L22.5 19 L35 28 Z" fill="#FFC2D4" stroke="none"/></g>' +
+        '<g class="ear-r"><path d="M80 42 L83 12 Q83 8.5 79.5 10.5 L57 27 Z" fill="#FFF8F1"/><path d="M76 34 L77.5 19 L65 28 Z" fill="#FFC2D4" stroke="none"/></g>' +
+        feetAndArms("#FFF8F1") + bodyAndArms("#FFF8F1") +
+        '<ellipse cx="50" cy="52" rx="37" ry="29" fill="#FFF8F1"/>' +
+        '<path d="M46 27 v5 M50 26 v6 M54 27 v5" fill="none" stroke="#E8B4A0" stroke-width="2"/>' +
+        '<path d="M16 58 L8 56 M16 62 L8 63 M84 58 L92 56 M84 62 L92 63" fill="none" stroke-width="1.4" opacity=".55"/></g>' +
+        eyes(36, 64, 54, 5.4, 6.6) + cheeks(24, 76, 63) +
+        '<ellipse cx="50" cy="60.5" rx="2.4" ry="1.7" fill="#E88FA8"/>' +
+        mouth("M44.5 64 Q47.2 68.5 50 64 Q52.8 68.5 55.5 64", 50, 65) +
+        '<path d="M72 24 L61 16 L61 32 Z" fill="#FF9EBB" ' + LINE + ' stroke-width="1.6"/><path d="M72 24 L83 16 L83 32 Z" fill="#FF9EBB" ' + LINE + ' stroke-width="1.6"/><circle cx="72" cy="24" r="3.6" fill="#FF7AA2"/>' +
+        SPARKLE(10, 24, 0) + SPARKLE(93, 40, 1.2),
       bear:
         '<g ' + LINE + '>' +
-        '<circle cx="24" cy="30" r="13" fill="#f6d5b8"/><circle cx="76" cy="30" r="13" fill="#f6d5b8"/>' +
-        BODY("#f6d5b8") +
-        '<ellipse cx="50" cy="67" rx="13" ry="9" fill="#fff3e6"/>' +
-        '<path d="M50 66 v3 M46 71 Q50 74 54 71" fill="none"/></g>' +
-        '<circle cx="24" cy="30" r="6" fill="#ffc2d4"/><circle cx="76" cy="30" r="6" fill="#ffc2d4"/>' +
-        '<ellipse cx="50" cy="63" rx="4" ry="3" fill="#5a3a48"/>' + FACE(54),
+        '<circle cx="21" cy="31" r="11.5" fill="#F4D2AE"/><circle cx="79" cy="31" r="11.5" fill="#F4D2AE"/>' +
+        feetAndArms("#F4D2AE") + bodyAndArms("#F4D2AE") +
+        '<ellipse cx="50" cy="52" rx="37" ry="29" fill="#F4D2AE"/>' +
+        '<ellipse cx="50" cy="62" rx="13" ry="9.5" fill="#FFF1E0"/></g>' +
+        '<circle cx="21" cy="31" r="5.5" fill="#FFC2D4"/><circle cx="79" cy="31" r="5.5" fill="#FFC2D4"/>' +
+        eyes(34, 66, 51, 5.2, 6.4) + cheeks(22, 78, 60) +
+        '<ellipse cx="50" cy="57.5" rx="4.2" ry="3.1" fill="' + INK + '"/><ellipse cx="51" cy="56.4" rx="1.3" ry=".8" fill="#fff"/>' +
+        mouth("M50 60.5 v3 M45 64 Q50 69 55 64", 50, 65) +
+        '<path d="M50 84 L39 78 L39 90 Z" fill="#FF9EBB" ' + LINE + ' stroke-width="1.6"/><path d="M50 84 L61 78 L61 90 Z" fill="#FF9EBB" ' + LINE + ' stroke-width="1.6"/><circle cx="50" cy="84" r="3.4" fill="#FF7AA2"/>' +
+        SPARKLE(90, 20, .6) + SPARKLE(9, 44, 1.8),
       bunny:
         '<g ' + LINE + '>' +
-        '<ellipse cx="35" cy="22" rx="9" ry="19" fill="#f4ecff"/><ellipse cx="65" cy="22" rx="9" ry="19" fill="#f4ecff"/>' +
-        '<circle cx="86" cy="76" r="7" fill="#fff"/>' +
-        BODY("#f4ecff") +
-        '<path d="M45 65 L50 69 L55 65 M50 69 v-3" fill="none"/></g>' +
-        '<ellipse cx="35" cy="24" rx="4" ry="12" fill="#ffc2d4"/><ellipse cx="65" cy="24" rx="4" ry="12" fill="#ffc2d4"/>' +
-        FACE(58)
+        '<circle cx="86" cy="80" r="7.5" fill="#fff"/>' +
+        '<g transform="rotate(-7 37 36)"><g class="ear-l"><ellipse cx="37" cy="17" rx="8.5" ry="19" fill="#F6F0FF"/><ellipse cx="37" cy="19" rx="4" ry="12" fill="#FFC2D4" stroke="none"/></g></g>' +
+        '<g transform="rotate(6 63 36)"><g class="ear-r"><ellipse cx="63" cy="17" rx="8.5" ry="19" fill="#F6F0FF"/><ellipse cx="63" cy="19" rx="4" ry="12" fill="#FFC2D4" stroke="none"/></g></g>' +
+        feetAndArms("#F6F0FF") + bodyAndArms("#F6F0FF") +
+        '<ellipse cx="50" cy="54" rx="36" ry="28" fill="#F6F0FF"/></g>' +
+        eyes(36, 64, 56, 5.3, 6.5) + cheeks(24, 76, 65) +
+        '<path d="M47.8 60.6 L50 63 L52.2 60.6 Z" fill="#E88FA8"/>' +
+        mouth("M50 63 v2.4 M46.3 67 Q50 70.5 53.7 67", 50, 67) +
+        '<g transform="translate(29 34)"><circle cx="0" cy="-4.4" r="3.3" fill="#FFB3C7"/><circle cx="4.2" cy="-1.4" r="3.3" fill="#FFB3C7"/><circle cx="2.6" cy="3.6" r="3.3" fill="#FFB3C7"/><circle cx="-2.6" cy="3.6" r="3.3" fill="#FFB3C7"/><circle cx="-4.2" cy="-1.4" r="3.3" fill="#FFB3C7"/><circle cx="0" cy="0" r="2.6" fill="#FFE29A"/></g>' +
+        SPARKLE(90, 30, .3) + SPARKLE(8, 76, 1.5)
     };
     // which drawing goes with which data-sticker name
     const artFor = { chiikawa: "bear", hachiware: "cat", usagi: "bunny" };
 
     function sticker(kind) {
-      return '<svg class="sticker-art" viewBox="0 0 100 100" aria-hidden="true">' + stickerArt[kind] + '</svg>';
+      const delay = (-Math.random() * 4).toFixed(1);
+      return '<svg class="sticker-art" style="--d:' + delay + 's" viewBox="0 0 100 100" aria-hidden="true">' + stickerArt[kind] + '</svg>';
     }
     // puts the drawings in place of the emoji (your PNGs, if found, replace these later)
     function applyFallbackArt(root) {
@@ -1466,6 +1534,7 @@ Your Baby ♡</p>
       if (c.dropSpeech) {
         c.dropSpeech = false;
         speak(c, pick(landLines), 1600);
+        playSound("land");
         c.pause = 1.2;
         c.el.classList.add("paused");
       }
@@ -1521,6 +1590,7 @@ Your Baby ♡</p>
           el.classList.add("held");
           el.classList.remove("paused");
           speak(c, pick(pickupLines), 1500);
+          playSound("pickup");
         }
         if (c.dragging) {
           c.x = e.clientX - el.offsetWidth / 2;
@@ -1549,6 +1619,7 @@ Your Baby ♡</p>
         if (c.sleeping) {                       // tapping a sleeping chibi wakes it up (for a little while)
           wakeUp(c);
           speak(c, pick(wakeLines), 2200);
+          playSound("tap");
           c.pause = 2;
           if (isNight) setTimeout(() => fallAsleep(c), 14000);
           return;
@@ -1562,6 +1633,7 @@ Your Baby ♡</p>
         while (line === c.lastLine) line = pick(pool); // never say the same thing twice in a row
         c.lastLine = line;
         speak(c, line);
+        playSound("chibi", 480 + i * 230);   // each chibi has its own squeak
         c.pause = 2.2;
         el.classList.add("paused");
         const r = el.getBoundingClientRect();
@@ -1685,6 +1757,7 @@ Your Baby ♡</p>
     openLetterButton.addEventListener("click", async (e) => {
       secretLetter.classList.add("show");
       if (!letterStarted) typeLetter();
+      playSound("letter");
       secretLetter.classList.add("show");
       openLetterButton.textContent = "Your letter is open ♡";
       secretLetter.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1815,6 +1888,7 @@ Your Baby ♡</p>
     document.querySelectorAll(".polaroid").forEach((card) => {
       card.addEventListener("click", () => {
         const flipped = card.classList.toggle("flipped");
+        playSound("flip");
         card.setAttribute("aria-pressed", flipped);
       });
     });
@@ -1840,6 +1914,7 @@ Your Baby ♡</p>
         secretEnvelope.scrollIntoView({ behavior: "smooth", block: "center" });
         rain();
         showToast("a secret envelope appeared ♡");
+        playSound("unlock");
       }
     }
 
@@ -1854,6 +1929,7 @@ Your Baby ♡</p>
       btn.addEventListener("click", () => {
         const card = btn.closest(".env-card");
         const open = card.classList.toggle("open");
+        playSound(open ? "envelope" : "paper");
         btn.setAttribute("aria-expanded", open);
         if (!open) return;
         card.classList.add("opened"); // stops its wiggling
@@ -2094,6 +2170,7 @@ Your Baby ♡</p>
     // "the bag" holds the reasons you haven't pulled yet, so none repeat until all are found
     let bag = [];
     jarBtn.addEventListener("click", () => {
+      playSound("jar");
       if (bag.length === 0) bag = reasons.map((_, i) => i).sort(() => Math.random() - 0.5);
       const index = bag.pop();
       const pulled = reasons.length - bag.length;
@@ -2140,6 +2217,7 @@ Your Baby ♡</p>
         remove.textContent = "✕";
         remove.setAttribute("aria-label", "Remove from favorites");
         remove.addEventListener("click", () => {
+          playSound("unsave");
           favorites = favorites.filter((f) => f !== text);
           storeSaved("monthsary-favorites", favorites);
           renderFavorites();
@@ -2154,8 +2232,10 @@ Your Baby ♡</p>
       if (!currentReason) return;
       if (favorites.includes(currentReason)) {
         favorites = favorites.filter((f) => f !== currentReason);
+        playSound("unsave");
       } else {
         favorites.push(currentReason);
+        playSound("save");
         const r = favBtn.getBoundingClientRect();
         burst(r.left + r.width / 2, r.top, 6);
       }
@@ -2262,10 +2342,10 @@ Your Baby ♡</p>
 
     // ----- cute squeaky sound, made right in the browser (no sound file needed) -----
     let audioCtx = null;
-    function beep(freqStart, freqEnd, start, duration, volume) {
+    function beep(freqStart, freqEnd, start, duration, volume, type) {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = "sine";
+      osc.type = type || "sine";
       osc.frequency.setValueAtTime(freqStart, start);
       osc.frequency.exponentialRampToValueAtTime(freqEnd, start + duration);
       gain.gain.setValueAtTime(0.0001, start);
@@ -2278,8 +2358,7 @@ Your Baby ♡</p>
     }
     function playHugSound(bigOne) {
       try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === "suspended") audioCtx.resume();
+        if (!getAudio()) return;
         const t = audioCtx.currentTime;
         const base = 520 + Math.random() * 120; // a tiny pitch change each time keeps it fun
         beep(base, base * 1.5, t, 0.14, 0.18);               // "mu-"
@@ -2291,6 +2370,90 @@ Your Baby ♡</p>
         // if the browser blocks sound, it just stays quiet
       }
     }
+
+    // ----- sound effects: every sound is made by the browser itself, so there are no audio files to upload -----
+    let soundOn = loadSaved("monthsary-sound", true);
+
+    function getAudio() {   // returns the audio engine, or nothing if sound is turned off
+      if (!soundOn) return null;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        return audioCtx;
+      } catch (error) {
+        return null;
+      }
+    }
+    function noiseBurst(start, duration, freq, volume) {   // a soft "shhh" like paper rustling
+      const length = Math.max(1, Math.floor(audioCtx.sampleRate * duration));
+      const buffer = audioCtx.createBuffer(1, length, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = freq;
+      filter.Q.value = 1.2;
+      const gain = audioCtx.createGain();
+      gain.gain.value = volume;
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      source.start(start);
+    }
+
+    // To change a sound, edit its line here. beep(startPitch, endPitch, when, howLong, volume)
+    const SOUNDS = {
+      tap(t) {   // soft and warm, like a fingertip on wood with a faint hush of air (low and gentle)
+        beep(260, 170, t, 0.16, 0.07);              // a low, round "tok"
+        beep(390, 300, t, 0.1, 0.02, "triangle");    // a tiny bit of warmth on top
+        noiseBurst(t, 0.14, 800, 0.045);            // very quiet brushing sound
+      },
+      paper(t) { noiseBurst(t, 0.12, 1600, 0.16); },
+      envelope(t) { noiseBurst(t, 0.18, 1800, 0.2); beep(660, 990, t + 0.12, 0.16, 0.09); beep(990, 1320, t + 0.22, 0.25, 0.09); },
+      flip(t) { noiseBurst(t, 0.08, 3000, 0.16); beep(420, 300, t, 0.1, 0.06); },
+      jar(t) {   // slips of paper rustling, then a sparkle that is a little different each time
+        [0, 0.07, 0.15, 0.23].forEach((d) => noiseBurst(t + d, 0.09, 2200 + Math.random() * 1600, 0.2));
+        const base = [784, 880, 988][Math.floor(Math.random() * 3)];
+        [1, 1.25, 1.5, 2].forEach((m, i) => beep(base * m, base * m, t + 0.3 + i * 0.08, 0.3, 0.09, "triangle"));
+      },
+      save(t) { beep(523, 523, t, 0.12, 0.12); beep(784, 784, t + 0.1, 0.12, 0.12); beep(1047, 1047, t + 0.2, 0.32, 0.11); },
+      unsave(t) { beep(784, 520, t, 0.18, 0.1); },
+      chibi(t, pitch) { beep(pitch, pitch * 1.6, t, 0.1, 0.12); beep(pitch * 1.3, pitch * 2, t + 0.09, 0.12, 0.1); },
+      pickup(t) { beep(500, 900, t, 0.14, 0.1); },
+      land(t) { beep(300, 150, t, 0.12, 0.14); noiseBurst(t, 0.06, 500, 0.18); },
+      heart(t, n) {   // each tap on the big heart is one note higher
+        const scale = [523, 587, 659, 784, 880, 1047, 1175, 1319, 1568, 1760];
+        const f = scale[Math.min(n, 9)];
+        beep(f, f, t, 0.2, 0.12, "triangle");
+      },
+      unlock(t) { [523, 659, 784, 1047, 1319].forEach((f, i) => beep(f, f, t + i * 0.1, 0.3, 0.11, "triangle")); },
+      letter(t) { [659, 784, 988, 1319].forEach((f, i) => beep(f, f, t + i * 0.12, 0.35, 0.09, "triangle")); }
+    };
+    function playSound(name, extra) {
+      if (!getAudio()) return;
+      try { SOUNDS[name](audioCtx.currentTime, extra); } catch (error) { /* stay quiet if anything goes wrong */ }
+    }
+
+    // a soft pop for the main buttons and menu links
+    document.addEventListener("click", (e) => {
+      if (e.target.closest(".hero-button, .nav a, #skipTyping, #songToggle, #playlistHere, #playlistOpen, #playlistSleeve, .surprise-button:not(#openLetter)")) playSound("tap");
+    });
+
+    // the little speaker button that turns sound effects on and off
+    const soundToggle = document.getElementById("soundToggle");
+    function updateSoundToggle() {
+      soundToggle.textContent = soundOn ? "🔊" : "🔇";
+      soundToggle.setAttribute("aria-label", soundOn ? "Sound effects are on. Tap to mute" : "Sound effects are off. Tap to turn on");
+    }
+    soundToggle.addEventListener("click", () => {
+      soundOn = !soundOn;
+      storeSaved("monthsary-sound", soundOn);
+      updateSoundToggle();
+      if (soundOn) playSound("tap");
+    });
+    updateSoundToggle();
 
     // ----- group hug: every chibi runs to the middle and hugs the screen -----
     const hugToast = document.getElementById("hugToast");
@@ -2378,6 +2541,7 @@ Your Baby ♡</p>
 
     bigHeart.addEventListener("click", () => {
       heartTaps++;
+      playSound("heart", heartTaps - 1);
       bigHeart.classList.remove("thump");
       void bigHeart.offsetWidth;
       bigHeart.classList.add("thump");
@@ -2392,6 +2556,7 @@ Your Baby ♡</p>
         burst(r.left + r.width / 2, r.top + r.height / 2, 16);
         rain();
         showToast("you found the secret ♡");
+        playSound("unlock");
       }
     });
 
